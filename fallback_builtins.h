@@ -88,18 +88,13 @@ static inline __m512i _mm512_zextsi128_si512(__m128i a) {
     out.val[3] = vqsubq_u16(a.val[3], b); \
 } while (0)
 
-/* Have to check for hard float ABI on GCC/clang, but not
- * on MSVC (we don't compile for the soft float ABI on windows)
- */
-#if !defined(ARM_NEON_HASLD4) && (defined(__ARM_FP) || defined(_MSC_VER))
-
 #ifdef _M_ARM64
 #  include <arm64_neon.h>
 #else
 #  include <arm_neon.h>
-#endif
 
-static inline uint16x8x4_t vld1q_u16_x4(uint16_t *a) {
+#undef vld1q_u16_x4
+static inline uint16x8x4_t vld1q_u16_x4(const uint16_t *a) {
     uint16x8x4_t ret = (uint16x8x4_t) {{
                           vld1q_u16(a),
                           vld1q_u16(a+8),
@@ -108,7 +103,8 @@ static inline uint16x8x4_t vld1q_u16_x4(uint16_t *a) {
     return ret;
 }
 
-static inline uint8x16x4_t vld1q_u8_x4(uint8_t *a) {
+#undef vld1q_u8_x4
+static inline uint8x16x4_t vld1q_u8_x4(const uint8_t *a) {
     uint8x16x4_t ret = (uint8x16x4_t) {{
                           vld1q_u8(a),
                           vld1q_u8(a+16),
@@ -117,13 +113,15 @@ static inline uint8x16x4_t vld1q_u8_x4(uint8_t *a) {
     return ret;
 }
 
-static inline void vst1q_u16_x4(uint16_t *p, uint16x8x4_t a) {
+#undef vst1q_u16_x4
+static inline void vst1q_u16_x4(uint16_t *p, const uint16x8x4_t a) {
     vst1q_u16(p, a.val[0]);
     vst1q_u16(p + 8, a.val[1]);
     vst1q_u16(p + 16, a.val[2]);
     vst1q_u16(p + 24, a.val[3]);
 }
-#endif // HASLD4 check and hard float
+#endif
+
 #endif // ARM_NEON_SLIDEHASH
 
 #endif // include guard FALLBACK_BUILTINS_H
