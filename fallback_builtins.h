@@ -92,7 +92,9 @@ static inline __m512i _mm512_zextsi128_si512(__m128i a) {
 #  include <arm64_neon.h>
 #else
 #  include <arm_neon.h>
+#endif // _M_ARM64
 
+#if !defined(__aarch64__)
 #undef vld1q_u16_x4
 static inline uint16x8x4_t vld1q_u16_x4(const uint16_t *a) {
     uint16x8x4_t ret = (uint16x8x4_t) {{
